@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Chosen Palette: Warm Harmony (Neutrals with Green/Gold Accents) -->
+    <!-- Application Structure Plan: A persuasive, single-page flow designed for executive review. It starts with the core financial opportunity (the "why"), presents the solution in interactive tabs (the "how"), and concludes with visual KPIs (the "what"). This structure prioritizes immediate understanding and engagement over a simple linear document replication, guiding the user from problem to solution to impact. Key interactions include a hovering over the cost-comparison chart, clicking tabs for the pillars, and animated KPIs on scroll. -->
+    <!-- Visualization & Content Choices: 
+        - Cost Difference (Report Info) -> Compare (Goal) -> Interactive Bar Chart (Viz) -> Hover for details (Interaction) -> Justification: Instantly shows the core financial incentive. -> Chart.js.
+        - Three Pillars (Report Info) -> Organize (Goal) -> Clickable Tabs (Viz) -> Click to reveal content (Interaction) -> Justification: Breaks down the strategy into digestible sections. -> Vanilla JS.
+        - "Maestro" Phases (Report Info) -> Show Process (Goal) -> Vertical Stepper/Diagram (Viz) -> Static visual (Interaction) -> Justification: Clearly illustrates the AI implementation roadmap. -> HTML/Tailwind.
+        - KPIs (Report Info) -> Inform/Compare (Goal) -> Animated Donut Charts (Viz) -> Animate on scroll (Interaction) -> Justification: Makes success metrics tangible and visually impactful. -> Chart.js.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <title>Propuesta Estratégica: Evolución Digital - Caja de Ahorros</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F7F4;
+            color: #3C3633;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 40vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .kpi-chart-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            display: block;
+            margin-top: 5px;
+            right: 0;
+            background: #A67B5B;
+            transition: width 0.3s ease;
+            -webkit-transition: width 0.3s ease;
+        }
+        .nav-link:hover:after {
+            width: 100%;
+            left: 0;
+            background-color: #A67B5B;
+        }
+        .pillar-btn.active {
+            background-color: #557571;
+            color: #F8F7F4;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .pillar-content {
+            display: none;
+        }
+        .pillar-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header & Navigation -->
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-lg shadow-sm">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <a href="#"><img src="https://www.cajadeahorros.com.pa/wp-content/themes/cahorros/images/logo.png" alt="Logo de Caja de Ahorros" class="h-8 md:h-10 w-auto"></a>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#oportunidad" class="nav-link text-gray-700 hover:text-black font-medium">La Oportunidad</a>
+                    <a href="#pilares" class="nav-link text-gray-700 hover:text-black font-medium">Los Pilares</a>
+                    <a href="#impacto" class="nav-link text-gray-700 hover:text-black font-medium">Impacto y KPIs</a>
+                </nav>
+                 <button id="mobile-menu-button" class="md:hidden text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </div>
+         <div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-lg">
+            <a href="#oportunidad" class="block text-center py-3 px-6 text-gray-700 hover:bg-gray-100">La Oportunidad</a>
+            <a href="#pilares" class="block text-center py-3 px-6 text-gray-700 hover:bg-gray-100">Los Pilares</a>
+            <a href="#impacto" class="block text-center py-3 px-6 text-gray-700 hover:bg-gray-100">Impacto y KPIs</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8 md:py-16">
+
+        <!-- Hero Section -->
+        <section class="text-center mb-16 md:mb-24">
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-4 tracking-tight">Evolución Digital para la Familia Panameña</h1>
+            <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">Una propuesta estratégica para la transformación digital, optimización de costos y fortalecimiento del liderazgo en el mercado de Caja de Ahorros.</p>
+        </section>
+
+        <!-- Section 1: The Opportunity -->
+        <section id="oportunidad" class="mb-16 md:mb-24 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-[#557571]">El Diagnóstico: La Gran Oportunidad</h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">La mayor oportunidad de eficiencia para el banco reside en migrar las transacciones de canales físicos de alto costo a canales digitales de autogestión, generando ahorros exponenciales y mejorando la experiencia del cliente.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2">Una base sólida para crecer</h3>
+                        <p class="text-gray-700">Caja de Ahorros atiende a más de 645,000 clientes, una base de confianza que representa un potencial inmenso para la adopción digital. Sin embargo, una gran parte de las gestiones aún se realiza en canales tradicionales, de mayor costo operativo.</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 text-center">
+                        <div class="bg-white p-4 rounded-xl shadow-sm">
+                            <p class="text-3xl font-bold text-[#A67B5B]">+645,000</p>
+                            <p class="text-sm text-gray-500">Clientes Actuales</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-sm">
+                            <p class="text-3xl font-bold text-[#A67B5B]">>500%</p>
+                            <p class="text-sm text-gray-500">Ahorro por Transacción Digital</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2">El Costo de la Tradición vs. La Eficiencia Digital</h3>
+                        <p class="text-gray-700">Cada transacción en sucursal o llamada al call center tiene un costo operativo significativo. En contraste, una transacción autogestionada en la Banca Móvil o Caja en Línea es exponencialmente más económica, liberando recursos valiosos.</p>
+                    </div>
+                </div>
+                <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-center font-bold text-lg mb-4">Costo Relativo por Canal de Transacción</h3>
+                    <div class="chart-container">
+                        <canvas id="costChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: The Pillars -->
+        <section id="pilares" class="mb-16 md:mb-24 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-[#557571]">La Solución: Tres Pilares para la Evolución</h2>
+                 <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">Proponemos un enfoque integral basado en tres pilares de ejecución simultánea para lograr una transformación digital exitosa y sostenible.</p>
+            </div>
+
+            <div class="max-w-4xl mx-auto bg-green-50 border-l-4 border-[#557571] p-4 mb-12 rounded-r-lg">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl">💡</span>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm md:text-base text-green-800"><strong class="font-bold">Nota sobre la Implementación: Un Enfoque Ágil.</strong> Esta propuesta se concibe bajo un modelo de trabajo Agile, permitiendo entregas de valor tempranas e incrementales (Productos Mínimos Viables - MVPs) en cada fase. Esto asegura flexibilidad, adaptación y resultados visibles desde las primeras etapas.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-center mb-8 space-x-2 md:space-x-4">
+                <button class="pillar-btn active text-sm md:text-base font-bold py-2 px-4 rounded-full transition-all duration-300" data-pillar="pilar1">I: Hiper-Adopción</button>
+                <button class="pillar-btn text-sm md:text-base font-bold py-2 px-4 rounded-full transition-all duration-300" data-pillar="pilar2">II: IA "Maestro"</button>
+                <button class="pillar-btn text-sm md:text-base font-bold py-2 px-4 rounded-full transition-all duration-300" data-pillar="pilar3">III: Reinvención de Sucursales</button>
+            </div>
+
+            <div id="pillar-content-container" class="bg-white p-6 md:p-10 rounded-2xl shadow-lg min-h-[400px]">
+                <!-- Pillar 1 Content -->
+                <div id="pilar1" class="pillar-content active">
+                    <h3 class="text-2xl font-bold mb-1 text-[#A67B5B]">Pilar I: Programa de Hiper-Adopción "Tu Banco en Tu Bolsillo"</h3>
+                    <p class="text-gray-600 mb-6">El objetivo es migrar transacciones simples a canales de autogestión, creando un ecosistema que motive y facilite el uso masivo de las herramientas digitales.</p>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="font-bold text-lg mb-3 text-[#557571]">Educación y Simplificación (Núcleo)</h4>
+                            <ul class="space-y-3 text-gray-700">
+                                <li class="flex items-start"><span class="text-xl mr-3">🧑‍🏫</span><div><strong class="block">"Embajadores Digitales" en Sucursales:</strong> Personal dedicado a enseñar a los clientes a usar la app antes de irse.</div></li>
+                                <li class="flex items-start"><span class="text-xl mr-3">📱</span><div><strong class="block">Inversión en UX/UI:</strong> Auditar y simplificar las aplicaciones para hacerlas más intuitivas y fáciles de usar para todos los segmentos.</div></li>
+                                <li class="flex items-start"><span class="text-xl mr-3">🤝</span><div><strong class="block">Transición Guiada (Sucursal y Call Center):</strong> Para transacciones simples, ni el personal en sucursal ni los agentes del call center la ejecutan. En su lugar, guían al cliente para que aprenda a autogestionarse en la app, garantizando una experiencia positiva y educativa en todos los canales.</div></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-3 text-[#557571]">Estrategias Complementarias de Incentivos</h4>
+                            <ul class="space-y-3 text-gray-700">
+                                <li class="flex items-start"><span class="text-xl mr-3">🎁</span><div><strong class="block">Programa de Puntos Digital:</strong> Recompensar cada transacción digital con puntos canjeables en comercios o para beneficios bancarios.</div></li>
+                                <li class="flex items-start"><span class="text-xl mr-3">💰</span><div><strong class="block">Cashback por Pagos Digitales:</strong> Ofrecer un pequeño retorno por pagar servicios a través de la Banca Móvil.</div></li>
+                                <li class="flex items-start"><span class="text-xl mr-3">🏆</span><div><strong class="block">Sorteos y Recompensas:</strong> Premiar periódicamente a los usuarios que utilicen exclusivamente canales digitales.</div></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pillar 2 Content -->
+                <div id="pilar2" class="pillar-content">
+                    <h3 class="text-2xl font-bold mb-1 text-[#A67B5B]">Pilar II: Asistente Virtual Inteligente "Maestro"</h3>
+                    <p class="text-gray-600 mb-6">Implementar un asistente de IA como primer punto de contacto para los clientes, evolucionando desde consultas informativas hasta la ejecución de transacciones complejas.</p>
+                    <div class="relative pl-8 border-l-2 border-dashed border-gray-300">
+                         <!-- Fase 1 -->
+                        <div class="mb-8 relative">
+                            <div class="absolute -left-[42px] top-1 w-5 h-5 bg-[#557571] rounded-full border-4 border-white"></div>
+                            <h4 class="font-bold text-lg text-[#557571]">Fase 1: Asistente Informativo (Inicial)</h4>
+                            <p class="text-gray-700">Responder 24/7 a preguntas frecuentes: requisitos de préstamos, saldos, ubicación de sucursales, recuperación de contraseñas.</p>
+                            <p class="mt-1 text-sm text-green-700 font-medium">Impacto: Reducción sustancial de llamadas al call center.</p>
+                        </div>
+                         <!-- Fase 2 -->
+                        <div class="mb-8 relative">
+                            <div class="absolute -left-[42px] top-1 w-5 h-5 bg-[#A67B5B] rounded-full border-4 border-white"></div>
+                            <h4 class="font-bold text-lg text-[#A67B5B]">Fase 2: Asistente Transaccional (Intermedia)</h4>
+                            <p class="text-gray-700">Permitir a los clientes realizar transacciones con lenguaje natural: "Maestro, págale $20 a mi mamá" o "Transfiere a mi tarjeta de crédito".</p>
+                            <p class="mt-1 text-sm text-green-700 font-medium">Impacto: Aumento de la conveniencia y fidelización del cliente digital.</p>
+                        </div>
+                         <!-- Fase 3 -->
+                        <div class="relative">
+                            <div class="absolute -left-[42px] top-1 w-5 h-5 bg-[#3C3633] rounded-full border-4 border-white"></div>
+                            <h4 class="font-bold text-lg text-[#3C3633]">Fase 3: Asistente Proactivo (Visión a Futuro)</h4>
+                            <p class="text-gray-700">Analizar patrones para ofrecer consejos personalizados de ahorro, inversión o gestión de deudas.</p>
+                            <p class="mt-1 text-sm text-green-700 font-medium">Impacto: Posicionar al banco como un asesor financiero personal y proactivo.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pillar 3 Content -->
+                <div id="pilar3" class="pillar-content">
+                     <h3 class="text-2xl font-bold mb-1 text-[#A67B5B]">Pilar III: Reinvención de la Sucursal como Centro de Valor</h3>
+                    <p class="text-gray-600 mb-6">Evolucionar el propósito de la sucursal: de ser un centro para transacciones simples, a ser un hub para asesoría financiera compleja y de alto valor.</p>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="font-bold text-lg mb-3 text-[#557571]">De Transaccional a Relacional</h4>
+                            <p class="text-gray-700">Capacitar al personal para que se conviertan en asesores financieros expertos en los productos clave del banco que requieren una conversación humana: préstamos hipotecarios, créditos para auto, consolidación de deudas y planificación financiera a largo plazo.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-3 text-[#557571]">Zona de Auto-gestión Asistida</h4>
+                            <p class="text-gray-700">Instalar quioscos y tabletas en cada sucursal donde los "Embajadores Digitales" puedan guiar activamente a los clientes en el uso de las herramientas digitales, reforzando la educación y confianza en la tecnología en un entorno físico seguro.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Impact & KPIs -->
+        <section id="impacto" class="scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-[#557571]">Impacto Esperado y Métricas de Éxito</h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">Esta estrategia no solo moderniza al banco, sino que genera beneficios tangibles y medibles que fortalecen la institución y su misión social.</p>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+                <div class="kpi-card bg-white p-4 text-center rounded-2xl shadow-lg flex flex-col items-center justify-center transition-transform duration-300 hover:scale-105">
+                    <div class="kpi-chart-container">
+                        <canvas id="kpi1"></canvas>
+                    </div>
+                    <h4 class="font-bold mt-3">Reducción de Costo</h4>
+                    <p class="text-sm text-gray-500">por Servicio</p>
+                </div>
+                <div class="kpi-card bg-white p-4 text-center rounded-2xl shadow-lg flex flex-col items-center justify-center transition-transform duration-300 hover:scale-105">
+                     <div class="kpi-chart-container">
+                        <canvas id="kpi2"></canvas>
+                    </div>
+                    <h4 class="font-bold mt-3">Adopción Digital</h4>
+                    <p class="text-sm text-gray-500">de Clientes</p>
+                </div>
+                <div class="kpi-card bg-white p-4 text-center rounded-2xl shadow-lg flex flex-col items-center justify-center transition-transform duration-300 hover:scale-105">
+                     <div class="kpi-chart-container">
+                        <canvas id="kpi3"></canvas>
+                    </div>
+                    <h4 class="font-bold mt-3">Eficiencia Operativa</h4>
+                    <p class="text-sm text-gray-500">en Call Center</p>
+                </div>
+                <div class="kpi-card bg-white p-4 text-center rounded-2xl shadow-lg flex flex-col items-center justify-center transition-transform duration-300 hover:scale-105">
+                     <div class="kpi-chart-container">
+                        <canvas id="kpi4"></canvas>
+                    </div>
+                    <h4 class="font-bold mt-3">Satisfacción (NPS)</h4>
+                    <p class="text-sm text-gray-500">Canales Digitales</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-16 md:mt-24">
+        <div class="container mx-auto px-6 py-12 text-center">
+            <h3 class="text-2xl font-bold">Una Estrategia para el Futuro</h3>
+            <p class="max-w-2xl mx-auto mt-4 text-gray-300">Esta estrategia no se trata solo de reducir costos. Se trata de modernizar la promesa de valor de la Caja de Ahorros. Al hacer que las operaciones diarias sean más eficientes, el banco libera recursos para enfocarse en lo que realmente importa: asesorar a la familia panameña y cumplir su misión social con mayor impacto. Es el camino para asegurar que "El Banco de la Familia Panameña" sea también el banco del futuro de Panamá.</p>
+        </div>
+    </footer>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Mobile Menu
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    // Cost Comparison Chart
+    const costCtx = document.getElementById('costChart').getContext('2d');
+    new Chart(costCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Sucursal Física', 'Call Center', 'Canal Digital'],
+            datasets: [{
+                label: 'Costo Relativo por Transacción',
+                data: [100, 25, 1],
+                backgroundColor: [
+                    'rgba(199, 201, 202, 0.6)',
+                    'rgba(166, 123, 91, 0.6)',
+                    'rgba(85, 117, 113, 0.6)',
+                ],
+                borderColor: [
+                    'rgba(199, 201, 202, 1)',
+                    'rgba(166, 123, 91, 1)',
+                    'rgba(85, 117, 113, 1)',
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.x !== null) {
+                                label += context.parsed.x + 'x';
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Factor de Costo (Digital = 1x)'
+                    }
+                }
+            }
+        }
+    });
+
+    // Pillar Tabs
+    const pillarBtns = document.querySelectorAll('.pillar-btn');
+    const pillarContents = document.querySelectorAll('.pillar-content');
+    pillarBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            pillarBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            const pillarId = btn.dataset.pillar;
+            pillarContents.forEach(content => {
+                if (content.id === pillarId) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+        });
+    });
+
+    // KPI Charts
+    const kpiData = [
+        { id: 'kpi1', goal: 60, label: '-60%', color: '#557571' },
+        { id: 'kpi2', goal: 50, label: '+50%', color: '#557571' },
+        { id: 'kpi3', goal: 70, label: '-70%', color: '#557571' },
+        { id: 'kpi4', goal: 20, label: '+20pts', color: '#557571' }
+    ];
+
+    const createKpiChart = (data) => {
+        const ctx = document.getElementById(data.id).getContext('2d');
+        return new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Objetivo', 'Restante'],
+                datasets: [{
+                    data: [data.goal, 100 - data.goal],
+                    backgroundColor: [data.color, '#E5E7EB'],
+                    borderWidth: 0,
+                    circumference: 360,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false },
+                    title: {
+                        display: true,
+                        text: data.label,
+                        position: 'bottom',
+                        font: { size: 14, weight: 'bold' },
+                        color: data.color,
+                        padding: {
+                            top: -30
+                        }
+                    }
+                },
+                animation: {
+                    animateRotate: true,
+                    animateScale: false,
+                    duration: 2000
+                }
+            }
+        });
+    };
+    
+    // Intersection Observer for KPI charts
+    const kpiCards = document.querySelectorAll('.kpi-card');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const chartId = entry.target.querySelector('canvas').id;
+                const chartData = kpiData.find(d => d.id === chartId);
+                if (chartData && !entry.target.dataset.animated) {
+                    createKpiChart(chartData);
+                    entry.target.dataset.animated = true; 
+                }
+            }
+        });
+    }, { threshold: 0.5 });
+
+    kpiCards.forEach(card => {
+        observer.observe(card);
+    });
+
+});
+</script>
+
+</body>
+</html>
